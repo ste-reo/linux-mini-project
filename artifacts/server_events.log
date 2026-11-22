@@ -1,0 +1,8 @@
+ERROR auth-service
+INFO api-gateway
+ERROR db-connector
+WARN cache-worker
+ERROR auth-service
+ERROR auth-service
+ERROR db-connector
+INFO health-check
