@@ -23,9 +23,9 @@
 
 ### Practical Operations
 Created a file-management workspace containing:
-- source/
-- backup/
-- archive/
+- `source/`
+- `backup/`
+- `archive/`
 
 Practised copying `application.log` into the backup directory, moving the copy into the archive directory, and interactively deleting it.
 
@@ -61,7 +61,7 @@ Variable data, including logs, caches and application state.
 #### /tmp
 Temporary files. Commonly configured with the sticky bit to restrict deletion by other users.
 
-Actual directory observations to be added after inspection.
+*To be populated as I run and verify directory navigation commands.*
 
 ## 4. System Monitoring and Administration
 
@@ -77,10 +77,10 @@ Actual directory observations to be added after inspection.
 - `sudo`
 
 ### System Metrics
-Actual outputs will be recorded after running the commands on the Ubuntu environment.
+*To be populated after running system monitoring commands.*
 
 ### Permissions and Ownership
-Practical exercises and observations to be documented after completion.
+*To be populated after running permissions and ownership exercises.*
 
 ## 5. Networking Basics
 
@@ -91,7 +91,7 @@ Practical exercises and observations to be documented after completion.
 - `ss -tulnp`
 
 ### Observations
-Actual network interfaces, connectivity results and listening sockets will be recorded from the system.
+*To be populated after running networking commands.*
 
 ## 6. Pipes and Redirection
 
@@ -105,7 +105,7 @@ Actual network interfaces, connectivity results and listening sockets will be re
 - `sort`: Sort output.
 - `uniq`: Identify adjacent duplicate lines.
 
-Practical exercises and command outputs to be added.
+*To be populated after running redirection and pipeline exercises.*
 
 ## 7. Shell Scripting
 
@@ -124,11 +124,11 @@ Practical exercises and command outputs to be added.
 ### Practical Objective
 Build a reusable workspace initialization script that checks for existing directories, creates missing directories and records execution timestamps.
 
-Execution results to be verified and documented.
+*To be populated after running and verifying `scripts/setup_workspace.sh`.*
 
 ## 8. Troubleshooting Log
 
-Record actual errors encountered, their causes and the commands used to resolve them.
+- **Git push rejected (`fetch first` / `non-fast-forward`):** The remote repository already had an initial commit, so I ran `git pull --rebase origin main`, resolved the `README.md` conflict with `git checkout --theirs README.md`, staged it with `git add README.md`, finished with `git rebase --continue`, and pushed with `git push -u origin main`.
 
 ## 9. Learning Summary
 
