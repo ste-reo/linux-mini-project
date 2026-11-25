@@ -12,6 +12,11 @@ if [[ -z "$BASE_DIR" ]]; then
   exit 1
 fi
 
+# Reject paths that already exist as regular files
+if [[ -f "$BASE_DIR" ]]; then
+  echo "Error: Target path exists as a regular file: $BASE_DIR" >&2
+  exit 1
+fi
 mkdir -p "$BASE_DIR"
 touch "$LOG_FILE"
 
