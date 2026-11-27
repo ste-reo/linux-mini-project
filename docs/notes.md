@@ -2,1205 +2,859 @@
 
 ## 1. Learning Environment
 
-- Operating System: Ubuntu on WSL
-- Shell: Bash
-- Project: Linux Command Line Mastery
-- Primary Focus: Linux administration and DevOps fundamentals
-- Repository: `linux-command-line-practice`
+### 1.1 Environment Overview
 
-### Learning Approach
+This project is practised in an Ubuntu Linux environment running inside Windows Subsystem for Linux (WSL2), providing a practical command-line workspace for Linux fundamentals, system administration, networking, text processing, and Bash scripting.
 
-This project focuses on developing practical Linux command-line proficiency through hands-on exercises.
+| **Component** | **Environment Detail** |
+| --- | --- |
+| **Operating System** | Ubuntu 26.04.1 LTS |
+| **Virtualisation Environment** | WSL2 |
+| **Shell** | GNU Bash 5.3.9 |
+| **Architecture** | `x86_64` |
+| **Kernel** | Linux `6.18.58.1-microsoft-standard-WSL2` |
+| **Project Directory** | `~/linux-command-line-practice` |
+| **Repository** | `linux-command-line-practice` |
 
-Each task should demonstrate:
+### 1.2 Learning Approach
 
-- The objective of the operation.
-- Commands and options used.
-- Understanding of the underlying concepts.
-- Verification of the results.
-- Relevance to real-world DevOps administration.
+Each exercise in this project is approached with emphasis on practical execution rather than rote memorisation alone:
 
-The project prioritises practical execution, understanding command behaviour, troubleshooting errors and documenting verified results.
+- **Conceptual understanding:** Clarifying what a command, flag, stream, or subsystem does before relying on it.
+
+- **Accurate execution:** Running commands cleanly in the WSL2 Ubuntu environment and checking paths, arguments, and privileges.
+
+- **Output interpretation:** Reading stdout, stderr, status indicators, and exit codes to verify what actually happened.
+
+- **DevOps relevance:** Connecting everyday CLI tasks to server administration, automation, containers, CI/CD, and troubleshooting workflows.
+
+- **Documented evidence:** Linking notes to organised terminal records and repository artifacts.
+### 1.3 Evidence
+
+- `screenshots/Section-1-Learning-Environment/01-ubuntu-wsl-bash-kernel-environment.png` — Recorded environment verification reference for Ubuntu, WSL2, Bash, and kernel details.
+
 
 ---
 
 ## 2. File Management
 
-### Project Requirements
+### 2.1 Objective
 
-Practise creating, copying, moving, renaming and deleting files and directories. Learn to inspect, read and search file contents using standard Linux utilities.
+Develop practical skills for creating, inspecting, copying, moving, renaming, deleting, and searching files and directories in Linux, alongside core concepts in file permissions, ownership, groups, user administration, and privileged operations.
 
-### Commands Practised
+### 2.2 Commands Practised
 
-- `touch`: Create empty files or update timestamps.
-- `mkdir -p`: Create nested directories, including missing parent directories.
-- `mkdir -v`: Display directory creation messages.
-- `ls -lah`: Inspect files, permissions, ownership and human-readable sizes, including hidden entries.
-- `tree`: Display directory hierarchies.
-- `cp`: Copy files.
-- `cp -r`: Recursively copy directories and their contents.
-- `cp -i`: Request confirmation before overwriting.
-- `cp -v`: Display copy operations.
-- `cp -p`: Preserve file attributes where possible.
-- `mv`: Move and rename files and directories.
-- `rm -i`: Request confirmation before deleting a file.
-- `rm -ri`: Recursively delete directories with interactive confirmation.
-- `rm -r`: Recursively delete directories and contents without confirmation.
-- `find`: Locate files and directories.
-- `grep`: Search file contents.
-- `grep -n`: Display matching line numbers.
-- `grep -i`: Perform case-insensitive matching.
-- `grep -r`: Search directories recursively.
-- `grep -rn`: Search recursively and display matching line numbers.
-- `grep -v`: Exclude matching lines.
-- `grep -vn`: Exclude matching lines and display original line numbers.
-- `grep -c`: Count matching lines.
-- `less`: Open files for interactive viewing.
-- `cat`: Display file contents.
-- `head`: Inspect the first lines of a file.
-- `tail`: Inspect the last lines of a file.
-- `cmp`: Compare files byte by byte.
-- `diff -r`: Compare directory contents recursively; further practical verification remains outstanding.
+| Command | Purpose |
+| --- | --- |
+| `touch` | Create empty files or update file timestamps. |
+| `mkdir` | Create directories (including nested paths when using `-p`). |
+| `ls` | List files and directories and inspect metadata. |
+| `tree` | Display directory hierarchies visually. |
+| `cp` | Copy files and directories. |
+| `mv` | Move or rename files and directories. |
+| `rm` | Remove files and directories (including interactive `-i` and recursive `-r` modes). |
+| `find` | Search directory trees for files and directories matching criteria. |
+| `grep` | Search file contents or streams for matching text patterns. |
+| `cat` | Concatenate and print file contents to standard output. |
+| `less` | Page through file contents interactively. |
+| `head` | Display the first lines of a file. |
+| `tail` | Display the last lines of a file. |
+| `cmp` | Compare two files byte by byte and report differences. |
+| `chmod` | Modify file and directory permission bits. |
+| `umask` | Inspect or set the default file-creation permission mask. |
+| `chown` | Change file or directory owner (and optionally group). |
+| `chgrp` | Change group ownership of files or directories. |
+| `id` | Display real and effective user ID (`uid`), group ID (`gid`), and supplementary group memberships. |
+| `groups` | Display the group memberships of the current or a specified user. |
+| `getent` | Query system administrative databases such as `passwd` and `group`. |
+| `groupadd` | Create a new user group. |
+| `useradd` | Create a new user account. |
+| `usermod` | Modify properties or group memberships of an existing user account.
 
-### Workspace Structure
 
-The file-management workspace is located at:
+### 2.3 Permissions, Ownership and User Administration
 
-`artifacts/file-management/`
+Linux enforces access control through read (`r`), write (`w`), and execute (`x`) permissions across three permission classes: **user (owner)**, **group**, and **others**.
 
-Its directories serve the following purposes:
+#### File vs. Directory Permissions
 
-- `source/`: Original application and error logs.
-- `backup/`: Backup copies of log files.
-- `archive/`: Files retained for archival purposes.
-- `processed/`: Workspace for files undergoing processing.
+* **On regular files:** `r` allows reading file contents; `w` allows modifying file contents (creating or deleting the file itself depends on write permission on the parent directory); `x` allows executing the file as a binary or script.
+* **On directories:** `r` allows listing directory entries (such as with `ls`); `w` allows creating, renaming, or removing entries inside the directory; `x` (traverse/search permission) allows passing through the directory to access files or subdirectories along a path. A directory with `r` but without `x` lets a user see entry names in a listing but blocks accessing metadata or opening files inside it.
 
-### Practical Operations
 
-#### 1. Creating directories
 
-Created the `processed/` directory using:
+#### Symbolic vs. Numeric Permissions and `umask`
 
-```bash
-mkdir -vp artifacts/file-management/processed
-```
+* **Symbolic notation (`chmod`):** Modifies specific classes and bits relative to current permissions (for example, `chmod u+x script.sh` adds execute for the owner, or `chmod g-w,o-rwx file` tightens group/other access).
+* **Numeric (octal) notation (`chmod`):** Sets exact permission bits using base-8 digits where `r=4`, `w=2`, and `x=1` per class (for example, `chmod 644 file` sets `rw-r--r--`, `chmod 755 dir_or_script` sets `rwxr-xr-x`, and `chmod 600 private_file` restricts access to `rw-------`).
+* **Default creation mask (`umask`):** Rather than granting full `0666` (files) or `0777` (directories) permissions on creation, the kernel masks out permission bits set in the process `umask` (for example, a `umask` of `0022` masks group and other write bits, yielding `0644` for new files and `0755` for new directories). Inspecting `umask` before and after changing it shows how default access is controlled for newly created items.
 
-The terminal confirmed successful directory creation.
 
-#### 2. Inspecting files and directories
 
-Inspected the workspace using:
+#### Ownership, Group Membership, Lookup and Privileged Redirection
 
-```bash
-tree artifacts/file-management
-ls -lah artifacts/file-management/
-find artifacts/file-management/ -type f
-```
+* **Ownership vs. group membership:** Every file has a single owning user and a single owning group (`chown owner:group target` or `chown owner target`; `chgrp group target`). Having a group as the file's group owner does not automatically grant access unless the **group** permission bits allow it; a user only exercises group permissions if their user ID matches one of the groups associated with the file (primary `gid` or supplementary groups).
+* **Identity and database queries (`id`, `groups`, `getent`):** `id` and `groups` show active user and group identities in the shell session, while `getent passwd <user>` and `getent group <group>` query system databases (including `/etc/passwd` and `/etc/group`) to verify account and group creation after `useradd`, `usermod`, and `groupadd`.
+* **Privileged execution and redirection (`sudo` and `sudo tee`):** Shell redirection operators (`>` and `>>`) are processed by the current non-root shell *before* the target command runs, so `sudo echo text > /root-owned-file` can fail with `Permission denied` even when `echo` runs under `sudo`. Piping into `sudo tee` (or `sudo tee -a` to append) runs `tee` with elevated privileges so it can write to restricted files.
 
-Inspected `source/application.log` using:
 
-```bash
-cat artifacts/file-management/source/application.log
-```
 
-Its contents were:
+### 2.4 File Searching and Inspection
 
-```text
-Application started successfully
-```
+Exercises practised locating files across directory trees with `find`, filtering lines by pattern with `grep`, and inspecting file contents using `cat`, `less`, `head`, and `tail`, alongside byte-by-byte comparison with `cmp`. Repository artifacts under `artifacts/file-management/` (such as `source/`, `source-backup/`, `backup/`, `processed/`, and `archive/`) and `artifacts/permissions-lab/` (such as `root-owned.txt`, `report.txt`, `private/secret.txt`, and `ownership-lab/`) reflect hands-on file and permission exercises.
 
-#### 3. Copying files
+#### Practical Walkthroughs (File Management & Permissions)
 
-Copied the original application log into the processing directory:
+* **Searching, comparing, and managing files (`find`, `grep`, `head`, `tail`, `cp`, `mv`, `rm`, `cmp`):**
+1. *Task:* Locate files, search text patterns, inspect file contents or slices, compare files, and copy, move/rename, or clean up test files and directories across `artifacts/file-management/`.
+2. *Commands used:* `find`, `grep`, `head`, `tail`, `cp`, `mv`, `rm`, and `cmp`.
+3. *Why appropriate:* Each command addresses a distinct step—discovering paths (`find`), matching lines (`grep`), sampling beginnings/ends (`head`/`tail`) or full contents (`cat`/`less`), verifying byte equality (`cmp`), and moving/copying/removing files in isolated lab folders.
+4. *Observed result:* Exercised file lookup, pattern filtering, content inspection, and file/directory lifecycle operations across structured lab subdirectories.
 
-```bash
-cp -vpi artifacts/file-management/source/application.log artifacts/file-management/processed/
-```
 
-Verified the original and copied files using:
+* **Permissions, `umask`, ownership and privileged redirection (`umask`, `chmod`, `chown`, `chgrp`, `getent`, `groupadd`, `sudo tee`):**
+1. *Task:* Inspect creation masks, adjust permissions and ownership, create groups/accounts, and write to restricted or root-owned files in `artifacts/permissions-lab/`.
+2. *Commands used:* `umask`, `chmod`, `chown`, `chgrp`, `getent`, `groupadd`, `useradd`/`usermod`, and `sudo tee`.
+3. *Why appropriate:* Combines permission bit inspection and updates, database verification (`getent`), and `sudo tee` so writes to restricted targets execute with elevated privileges rather than failing under shell redirection.
+4. *Observed result:* Established how `umask` and `chmod` control file/directory modes, how `chown`/`chgrp` and `getent` manage/verify ownership and groups, and how `sudo tee` writes to root-owned targets such as `artifacts/permissions-lab/root-owned.txt`.
 
-```bash
-ls -l artifacts/file-management/source/
-ls -l artifacts/file-management/processed/
-```
 
-Compared both files using:
 
-```bash
-cmp artifacts/file-management/source/application.log artifacts/file-management/processed/application.log
-echo $?
-```
 
-The comparison produced no output, and the exit status was `0`, confirming that both files were identical.
 
-#### 4. Moving and renaming files
+### 2.5 Practice Status
 
-Copied `error.log` from `source/` into `processed/`:
+All planned file management, permission, ownership, user/group administration, and privileged redirection exercises for this section were practised during the hands-on sessions, supported by the lab files and records in the repository.
 
-```bash
-cp -v artifacts/file-management/source/error.log artifacts/file-management/processed/
-```
+### 2.6 Evidence
 
-Then moved the copied file into `archive/`, renaming it:
+* **Section Screenshots:**
+* `screenshots/Section-2-File-Management/01-find-grep-head-tail-cp-mv-rm.png` — Searching, content inspection, and file copy/move/delete exercises.
+* `screenshots/Section-2-File-Management/02-permissions-umask-and-chmod.png` — Permission modes and default `umask` inspection/modification.
+* `screenshots/Section-2-File-Management/03-chown-chgrp-and-privileged-redirection.png` — File/group ownership changes (`chown`, `chgrp`) and privileged output redirection (`sudo tee`).
+* `screenshots/Section-2-File-Management/04-ownership-and-users-groups-getent-groupadd.png` — User/group database queries (`getent`) and group creation (`groupadd`).
 
-```bash
-mv -v artifacts/file-management/processed/error.log artifacts/file-management/archive/error-processed.log
-```
 
-This demonstrates that `mv` can relocate and rename a file in a single operation.
+* **Supplementary Screenshots:**
+* `screenshots/01-file-management.png` — Earlier file management lab capture.
+* `screenshots/03b-permissions-admin.png` — Earlier permissions and administrative operations capture.
 
-The original `source/error.log` remains untouched because the initial operation used `cp`, not `mv`.
 
-#### 5. Searching with find and grep
+* **Repository Artifacts:**
+* `artifacts/file-management/` (`source/`, `source-backup/`, `backup/`, `processed/`, `archive/`) and `artifacts/permissions-lab/` (`root-owned.txt`, `report.txt`, `private/secret.txt`, `ownership-lab/`).
 
-Examples:
-
-```bash
-find artifacts/file-management/ -type f -name "*.log"
-```
-
-Finds regular files ending in `.log`.
-
-```bash
-grep "ERROR" file
-```
-
-Displays lines containing `ERROR`.
-
-```bash
-grep -n "ERROR" file
-```
-
-Displays matching lines with line numbers.
-
-```bash
-grep -i "error" file
-```
-
-Performs case-insensitive matching.
-
-```bash
-grep -r "ERROR" directory/
-```
-
-Searches recursively through files in a directory.
-
-```bash
-grep -rn "ERROR" directory/
-```
-
-Searches recursively and displays matching line numbers.
-
-```bash
-grep -v "ERROR" file
-```
-
-Excludes lines containing `ERROR`.
-
-```bash
-grep -vn "ERROR" file
-```
-
-Excludes matching lines and displays original line numbers.
-
-```bash
-grep -c "ERROR" file
-```
-
-Counts matching lines.
-
-**Practical observations:**
-
-- Recursive searching identified errors across source and archive directories.
-- The server event log contained five `ERROR` lines.
-- Inverted searching retained three non-error lines.
-- Grep searches and displays results without modifying the original files.
-
-#### 6. Copying, moving and safe deletion
-
-Practised recursive directory copying:
-
-```bash
-cp -r source destination
-```
-
-Practised copying with overwrite protection using `cp -i`. Answering `n` declined the overwrite.
-
-Practised deletion using:
-
-```bash
-rm -i
-rm -ri
-rm -r
-```
-
-Observations:
-
-- `rm -i` requests confirmation before deleting a file.
-- `rm -ri` recursively deletes directories with interactive confirmation.
-- Answering `n` to the descend prompt cancels that recursive deletion.
-- `rm -r` removes a directory and its contents without confirmation.
-- Practised removing the disposable `artifacts/deletion-lab/` directory using `rm -r`.
-
-**Important:** Recursive deletion should only be performed after checking the target path. An incorrect path can cause significant data loss.
-
-#### 7. Interactive file inspection with less
-
-Practised opening files using:
-
-```bash
-less filename
-```
-
-Useful navigation and search keys:
-
-- `/ERROR`: Search for a matching term.
-- `n`: Move to the next match.
-- `q`: Exit the viewer.
-
-`less` is useful for inspecting large files without printing the entire contents to the terminal.
-
-### Observations and Lessons
-
-- `mkdir -p` creates missing parent directories.
-- `mkdir -v` displays directory creation information.
-- `ls -lah` provides detailed directory listings, including hidden entries and human-readable sizes.
-- `tree` provides a visual representation of directory hierarchies.
-- `find -type f` recursively locates regular files.
-- Relative paths are resolved from the current working directory, while absolute paths begin at `/`.
-- `cp` creates a separate copy while retaining the original.
-- `cp -i` helps prevent accidental overwriting by requesting confirmation.
-- `cp -v` displays the source and destination of copy operations.
-- `cp -p` preserves file attributes where possible.
-- `mv` removes a file from its original location after a successful move.
-- `mv` can rename files by specifying a new destination filename.
-- Unlike `cp`, `mv` does not require `-r` to move directories.
-- `cmp` produces no output when two files are identical.
-- Exit status `0` indicates success; `1` from `cmp` indicates differing files.
-- `grep` searches text without changing the original files.
-- `less` allows interactive inspection of large files.
-
-### Troubleshooting Experiences
-
-**Incorrect source path**
-
-Error:
-
-```text
-cp: cannot stat 'application.log': No such file or directory
-```
-
-Cause: The command used a relative path that did not match the file's actual location.
-
-Resolution: Used the correct path from the project root:
-
-```text
-artifacts/file-management/source/application.log
-```
-
-**Incorrect command arguments**
-
-Error:
-
-```text
-cp: target '...' is not a directory
-```
-
-Cause: Incorrect source and destination arguments.
-
-Lesson: Understand the `SOURCE DESTINATION` structure before executing file operations.
-
-**Partial command success**
-
-Observation: A copy command reported an error for an invalid source argument but successfully copied another valid source file.
-
-Lesson: A command can partially succeed. Always inspect its output and verify the resulting files.
-
-**Attempting to execute a text file**
-
-Error: `command not found` or `Permission denied`.
-
-Cause: Attempted to execute a log file as though it were a program.
-
-Resolution: Use `cat` or another file-inspection command to read text files.
-
-### Remaining File Management Verification
-
-- [ ] Verify recursive directory comparison using `diff -r`.
-- [ ] Independently verify `cp -p` attribute preservation.
-- [ ] Capture screenshots showing commands and successful results.
-
-### DevOps Relevance
-
-File management is essential for:
-
-- Organising application files and deployment directories.
-- Creating backups before configuration changes.
-- Staging files for processing and deployment.
-- Managing application logs and archived records.
-- Verifying copied files before replacing important files.
-- Troubleshooting filesystem operations and incorrect paths.
-
----
 
 ## 3. Directory Navigation and Filesystem
 
-### Project Requirements
+### 3.1 Objective and Project Alignment
 
-Navigate the Linux filesystem using absolute and relative paths, create nested directory structures and understand the purpose of standard Linux directories.
+Build practical confidence navigating the Linux filesystem using absolute and relative paths, creating and inspecting nested directory structures with `mkdir -p`, and understanding the purpose, organisation, permissions, and operational roles of standard Linux directories—including `/etc`, `/var`, `/var/log`, and `/tmp`—as well as symbolic links, log inspection, and log rotation in support of the **Linux and Command Line Mastery** project.
 
-### Commands Practised
+### 3.2 Commands Practised
 
-- `pwd`: Display the current working directory.
-- `cd`: Change directories.
-- `cd ..`: Move to the parent directory.
-- `cd ../..`: Move up two directory levels.
-- `cd -`: Return to the previous working directory.
-- `cd /`: Navigate to the filesystem root.
-- `cd ~`: Navigate to the user's home directory.
-- `ls -la`: List files, including hidden entries, with detailed information.
-- `ls -lah`: Display detailed listings with human-readable sizes.
-- `mkdir -p`: Create nested directory structures.
-- `find`: Search for files and directories.
-- `tree`: Display directory structures.
+| Command | Purpose |
+| --- | --- |
+| `pwd` | Display the current working directory. |
+| `cd` | Change the current working directory. |
+| `cd ..` | Move to the parent directory. |
+| `cd ../..` | Move up two directory levels. |
+| `cd -` | Return to the previous working directory. |
+| `cd /` | Navigate to the filesystem root. |
+| `cd ~` | Navigate to the current user's home directory. |
+| `ls` | List directory contents. |
+| `ls -la` | Display hidden entries and detailed file metadata. |
+| `ls -lah` | Display detailed listings with human-readable file sizes. |
+| `ls -ld` | Display permissions and ownership metadata for directories themselves rather than their contents. |
+| `mkdir -p` | Create nested directory structures, including missing parent directories. |
+| `find` | Search for files and directories using names, types, depth, and other criteria. |
+| `tree` | Display directory structures hierarchically. |
+| `cat` | Display file contents, including configuration files. |
+| `tail` | Display the last lines of a file. |
+| `grep` | Search text for matching patterns. |
+| `zgrep` | Search compressed files using grep-style patterns. |
+| `sudo` | Execute authorised commands with elevated privileges. |
 
-### Understanding Linux Paths
+### 3.3 Understanding Linux Paths
 
-**Absolute paths**
+Linux uses a hierarchical filesystem structure that begins at the root directory `/`. Commands such as `cd` and `pwd` operate relative to the current working directory unless an absolute path is supplied.
 
-An absolute path starts from the filesystem root `/`.
+#### Absolute Paths
 
-Example:
+An absolute path starts from the filesystem root `/` and identifies a location independently of the current working directory.
 
 ```bash
 cd /var/log
+
 ```
 
-The path identifies the destination independently of the current working directory.
+This navigates directly to `/var/log`, regardless of the directory from which the command is executed.
 
-**Relative paths**
+#### Relative Paths
 
-A relative path starts from the current working directory.
-
-Example:
+A relative path is interpreted from the current working directory.
 
 ```bash
 cd ../..
+
 ```
 
-This moves up two directory levels from the current location.
+This moves two directory levels upward from the current location.
 
-**Important navigation concepts:**
+#### Important Navigation Symbols
 
-- `/` represents the filesystem root.
-- `~` represents the current user's home directory.
-- `.` represents the current directory.
-- `..` represents the parent directory.
-- `cd -` switches to the previous working directory.
+| Symbol | Meaning |
+| --- | --- |
+| `/` | Filesystem root. |
+| `~` | Current user's home directory. |
+| `.` | Current directory. |
+| `..` | Parent directory. |
+| `-` | Previous working directory when used with `cd`. |
 
-### Practical Navigation Exercises
+#### Understanding `cd ..` vs. `cd -`
 
-#### 1. Navigating project directories
+These commands perform different operations:
 
-From:
+* `cd ..` moves to the parent directory in the filesystem hierarchy.
+* `cd -` returns to the previous working directory.
+
+```bash
+cd /var
+cd /tmp
+cd -
+
+```
+
+The final command returns to `/var`, rather than moving to `/`. Understanding this distinction helps when navigating between project directories and system locations.
+
+### 3.4 Practical Navigation Exercises
+
+All navigation and directory-creation exercises in this section were practised hands-on in the Ubuntu WSL2 environment.
+
+#### 1. Navigating Project Directories and Creating Nested Structures
+
+Starting from:
 
 ```text
 ~/linux-command-line-practice/artifacts/file-management
+
 ```
 
-Used:
+Executed:
 
 ```bash
 cd ../..
+pwd
+
 ```
 
-This moved two levels upward to the project root:
+The navigation moved two directory levels upward to the project root:
 
 ```text
 /home/victor/linux-command-line-practice
+
 ```
 
-#### 2. Switching between directories
+Nested directory structures were also created and inspected using `mkdir -p`, `ls -la`, and `tree` (including project and lab paths such as `artifacts/navigation/projects/webapp/logs/`).
 
-Used:
+**What this demonstrated:**
+
+* Relative paths can navigate directory hierarchies without specifying the complete path.
+* Each `..` represents one parent-directory transition.
+* `mkdir -p` creates parent directories automatically when building nested structures, and `pwd` verifies the resulting location.
+
+#### 2. Switching Between Directories
+
+Executed:
 
 ```bash
 cd /tmp
 cd -
+
 ```
 
-`cd -` returned to the previous working directory.
+The second command returned to the previous working directory. This demonstrated how `cd -` switches between two working locations without repeatedly typing their absolute paths.
 
-This demonstrated the difference between:
+#### 3. Exploring the Filesystem Root
 
-- `cd ..`: Move to the parent directory.
-- `cd -`: Return to the previous working directory.
-
-#### 3. Exploring the filesystem root
-
-Used:
+Executed:
 
 ```bash
 cd /
 ls -lah
+
 ```
 
-The filesystem root contains important system directories and mount points.
+The root directory contains the main directories and mount points that form the Linux filesystem hierarchy. The `-a` option includes hidden entries, while `-h` displays file sizes in human-readable units.
 
-#### 4. Exploring /etc
+#### 4. Exploring `/etc`
 
-Used:
+Executed:
 
 ```bash
 cd /etc
 ls
+
 ```
 
-Observed that `/etc` contains system-wide configuration files and directories.
+Observed that `/etc` contains system-wide configuration files and directories that define how services, applications, and other system components behave.
 
-Configuration files define how system services and applications behave.
+#### 5. Exploring `/var` and `/tmp`
 
-#### 5. Exploring /var
-
-Used:
+Executed:
 
 ```bash
 cd /var
 ls -lah
+
 ```
 
-Observed directories including:
-
-- `backups/`
-- `cache/`
-- `crash/`
-- `lib/`
-- `local/`
-- `log/`
-- `mail/`
-- `opt/`
-- `spool/`
-- `tmp/`
-
-Also observed:
+Observed directories including `backups/`, `cache/`, `crash/`, `lib/`, `local/`, `log/`, `mail/`, `opt/`, `spool/`, and `tmp/`, along with symbolic links:
 
 ```text
 lock -> /run/lock
 run  -> /run
+
 ```
 
-These are symbolic links pointing to locations under `/run`.
+A symbolic link is a filesystem object that references another file or directory so it can be accessed through an alternative path. Directory permission checks (`ls -ld`) across `/etc`, `/var`, and `/tmp` also highlighted `/tmp`'s sticky bit (`drwxrwxrwt`), which allows shared temporary writes while preventing users from deleting or renaming files owned by others.
 
-Used:
+#### 6. Searching the `/var` Directory
+
+Executed:
 
 ```bash
 find . -maxdepth 1 -type f
+
 ```
 
 Observed:
 
 ```text
 ./.updated
+
 ```
 
-This command lists regular files directly inside the current directory, without searching deeper into subdirectories.
+This command searches for regular files directly inside the current directory without descending into child directories.
 
-**Understanding the command:**
+| Component | Meaning |
+| --- | --- |
+| `find` | Search for filesystem entries. |
+| `.` | Start searching from the current directory. |
+| `-maxdepth 1` | Limit the search to the starting directory level. |
+| `-type f` | Return regular files only. |
 
-- `.`: Start searching in the current directory.
-- `-maxdepth 1`: Do not descend into child directories.
-- `-type f`: Return regular files only.
+This demonstrated how `find` narrows a filesystem search using location, depth, and file type.
 
-### Linux Filesystem Hierarchy
+### 3.5 Understanding the Linux Filesystem Hierarchy
 
-#### /
+Linux organises files and directories according to established filesystem conventions. Understanding these locations makes it easier to navigate systems, locate configuration, investigate logs, and troubleshoot applications.
 
-The root of the Linux filesystem. Other directories and mounted filesystems exist beneath it.
+| Directory | Purpose |
+| --- | --- |
+| `/` | Root of the entire filesystem hierarchy. |
+| `/home` | Contains users' personal home directories and files. |
+| `/root` | Home directory of the root administrative account. |
+| `/etc` | Stores system-wide configuration files. |
+| `/var` | Stores variable operational data that changes during system operation. |
+| `/var/log` | Contains system and application logs. |
+| `/var/cache` | Stores regenerable cached application data. |
+| `/var/lib` | Stores persistent application and system state. |
+| `/var/spool` | Holds queued work awaiting processing. |
+| `/tmp` | Stores temporary files used by applications and processes. |
+| `/run` | Stores volatile runtime information, commonly cleared during boot. |
+| `/usr` | Contains many user-space applications, libraries, and shared resources. |
+| `/opt` | Provides a location for optional or separately installed software. |
+| `/dev` | Contains device files representing hardware and virtual devices. |
+| `/proc` | Virtual filesystem exposing process and kernel information. |
+| `/sys` | Virtual filesystem exposing kernel, device, and hardware information. |
 
-#### /home
+#### Understanding `/etc` vs. `/var`
 
-Contains users' home directories and personal files.
+* `/etc` primarily stores configuration describing how applications and services should operate (for example, `/etc/rsyslog.conf`).
+* `/var` stores operational data generated or changed while the system is running (for example, `/var/log/syslog`).
 
-Example:
+This distinction is useful when troubleshooting whether a problem originates from configuration or runtime behaviour.
 
-```text
-/home/victor
-```
+### 3.6 Practical Investigation: `/var/log`
 
-#### /etc
-
-Contains system-wide configuration files and directories.
-
-Examples include service configuration and application settings.
-
-#### /var
-
-Contains variable data that changes during normal system operation.
-
-Examples:
-
-- Logs.
-- Application state.
-- Caches.
-- Package and database state.
-- Queued or spooled data.
-
-Unlike `/etc`, which primarily stores configuration, `/var` stores operational data that changes as the system runs.
-
-#### /var/log
-
-Contains system and application logs.
-
-Used to investigate system events, service behaviour, errors and authentication activity.
-
-#### /var/cache
-
-Stores cached data that applications can regenerate when needed.
-
-#### /var/lib
-
-Stores persistent application and system state.
-
-#### /var/spool
-
-Contains queued work waiting to be processed, such as mail or print jobs.
-
-#### /tmp
-
-Stores temporary files.
-
-Applications and processes use it for temporary data. It is commonly configured with the sticky bit to restrict deletion by other users.
-
-### Practical Investigation: /var/log
-
-Inspected the log directory using:
+The `/var/log` directory was inspected to understand how Linux records system events, application activity, authentication operations, and package-management activity.
 
 ```bash
 ls -lah /var/log
+
 ```
 
-Observed log files and directories including:
-
-- `syslog`
-- `auth.log`
-- `kern.log`
-- `dmesg`
-- `dpkg.log`
-- `alternatives.log`
-- `bootstrap.log`
-- `journal/`
-- `apt/`
-- `unattended-upgrades/`
-
-These logs serve different purposes:
+Observed files and directories included `syslog`, `auth.log`, `kern.log`, `dmesg`, `dpkg.log`, `alternatives.log`, `bootstrap.log`, `journal/`, `apt/`, and `unattended-upgrades/`.
 
 | Log | Purpose |
-|---|---|
+| --- | --- |
 | `syslog` | General system and service events. |
 | `auth.log` | Authentication and privilege-related activity. |
 | `kern.log` | Kernel-related messages. |
-| `dmesg` | Kernel ring buffer messages, often relating to system and device initialisation. |
-| `dpkg.log` | Package installation, removal and configuration activity. |
+| `dmesg` | Kernel ring-buffer messages, commonly associated with hardware and system initialisation. |
+| `dpkg.log` | Package installation, removal, and configuration activity recorded by DPKG. |
 | `alternatives.log` | Changes managed by the alternatives system. |
 
-### Understanding File Permissions and Ownership
+### 3.7 Understanding File Permissions and Ownership
 
-The following example was observed in `/var/log`:
+While inspecting `/var/log`, the following authentication-log entry was observed:
 
 ```text
 -rw-r----- 1 syslog adm 5.3K auth.log
+
 ```
 
-Breakdown:
+| Component | Meaning |
+| --- | --- |
+| `-` | Regular file. |
+| `rw-` | Owner has read and write permissions. |
+| `r--` | Group has read permission. |
+| `---` | Other users have no permissions. |
+| `syslog` | File owner. |
+| `adm` | Group ownership. |
 
-- `-`: Regular file.
-- `rw-`: Owner can read and write.
-- `r--`: Group can read.
-- `---`: Other users have no permissions.
-- `syslog`: File owner.
-- `adm`: Group ownership.
-
-This shows why some log files require elevated privileges or membership in an authorised group to inspect.
-
-`sudo` allows authorised users to execute commands with elevated privileges.
-
-### Practical Log Investigation
-
-#### 1. Inspecting recent system logs
-
-Used:
-
-```bash
-tail -n 15 /var/log/syslog
-```
-
-This displayed the last 15 lines of the system log.
-
-`tail` is useful when investigating large logs because it displays the most recent entries without printing the entire file.
-
-#### 2. Filtering system errors
-
-Used:
-
-```bash
-grep -i "error" /var/log/syslog | tail -n 10
-```
-
-Command breakdown:
-
-- `grep`: Searches for matching text.
-- `-i`: Ignores case differences.
-- `"error"`: Search term.
-- `|`: Passes the output to another command.
-- `tail -n 10`: Displays the last ten matching lines.
-
-Observed WSL-related messages included:
-
-- `CheckConnection: getaddrinfo() failed`.
-- `ConfigApplyWindowsLibPath`.
-- `InitializeLogging`.
-- `failed to collect insights`.
-
-The log also contained recurring WSL Ubuntu Pro service warnings because the Windows agent address file could not be found.
-
-These observations demonstrate that log messages must be interpreted in context. A message containing `ERROR` does not automatically indicate a critical system failure.
-
-#### 3. Inspecting authentication logs
-
-Used:
+The permission string `rw-r-----` (`640`) allows the owner (`syslog`) to read and modify the file, allows group members (`adm`) to read it, and denies access to other users through permission bits. Because logs can contain sensitive usernames, commands, and service events, restricted access protects log integrity and privacy. For authorised administrative access, `sudo` runs the command with elevated privileges:
 
 ```bash
 sudo tail -n 15 /var/log/auth.log
+
 ```
 
-Observed entries relating to:
+### 3.8 Practical Log Investigation
 
-- `CRON` opening and closing scheduled sessions as root.
-- `sudo` opening and closing privileged sessions.
-- The user `victor` executing a command with elevated privileges.
+All log inspection and filtering exercises below were practised in the lab environment.
 
-An observed sudo entry included:
+#### 1. Inspecting Recent System Logs
 
-```text
-TTY=/dev/pts/0
-PWD=/var
-USER=root
-COMMAND=/usr/bin/tail -n 15 /var/log/auth.log
+```bash
+tail -n 15 /var/log/syslog
+
 ```
 
-Interpretation:
+`tail` shows recent entries quickly without printing large log files in full, making it a primary starting point when investigating unexpected service or system behaviour.
 
-- `TTY`: Terminal associated with the command.
-- `PWD`: Working directory when the command was executed.
-- `USER`: Account the command ran as.
-- `COMMAND`: Command executed with elevated privileges.
+#### 2. Filtering System Errors
 
-Authentication logs can help investigate successful and failed authentication attempts, privilege escalation and suspicious access.
+```bash
+grep -i "error" /var/log/syslog | tail -n 10
 
-#### 4. Searching for authentication failures
+```
 
-Used:
+* `grep` searches input for matching text; `-i` makes matching case-insensitive; `"error"` sets the pattern; `|` pipes output to `tail -n 10` to show the last ten matches.
+* Observed WSL-related messages included `CheckConnection: getaddrinfo() failed`, `ConfigApplyWindowsLibPath`, `InitializeLogging`, `failed to collect insights`, and recurring WSL Ubuntu Pro service warnings when the Windows agent address file was not found.
+* Error lines must be evaluated in context—looking at component, frequency, surrounding lines, and actual impact—rather than assuming the entire system is down.
+
+#### 3. Inspecting Authentication Logs
+
+```bash
+sudo tail -n 15 /var/log/auth.log
+
+```
+
+Observed `CRON` and `sudo` session activity, including user `victor` running a privileged command (`TTY=/dev/pts/0`, `PWD=/var`, `USER=root`, `COMMAND=/usr/bin/tail -n 15 /var/log/auth.log`).
+
+#### 4. Searching for Authentication Failures
 
 ```bash
 sudo grep -iE "failed|failure|invalid|authentication failure" /var/log/auth.log | tail -n 15
-```
-
-Also searched the previous log:
-
-```bash
 sudo grep -iE "failed|failure|invalid|authentication failure" /var/log/auth.log.1
+
 ```
 
-No matching entries were returned in the inspected files.
+* `-E` enables extended regular expressions so `|` inside quotes acts as alternation (`failed` or `failure` or `invalid` or `authentication failure`).
+* No matching failure lines appeared in those inspected files. Absence of matches in a single log or current window does not prove no unauthorised attempts occurred elsewhere, under different wording, or in older rotated archives.
 
-**Important observation:**
+### 3.9 Understanding Log Rotation and Investigating Configuration
 
-No matching results do not prove that no unauthorised access was attempted.
+Log rotation prevents log files from growing without bound and exhausting disk space by rotating, retaining, and compressing logs according to policies in `/etc/logrotate.d/`.
 
-Possible explanations include:
-
-- The event occurred outside the current log's retention period.
-- The event was recorded in an older rotated log.
-- The event was recorded using different wording.
-- Another logging source contains the relevant event.
-
-Log investigations should consider the relevant time period and all appropriate log sources.
-
-### Understanding Log Rotation
-
-Log files can grow continuously as services and applications record events.
-
-Allowing them to grow indefinitely could consume significant disk space.
-
-Linux systems use log rotation to manage log size and retention.
-
-Common rotated log filenames include:
-
-```text
-auth.log
-auth.log.1
-auth.log.2.gz
-auth.log.3.gz
-```
-
-General interpretation:
-
-- `auth.log`: Current log.
-- `auth.log.1`: Most recently rotated log.
-- `auth.log.2.gz`: An older compressed generation.
-- `auth.log.3.gz`: Another older compressed generation.
-
-The exact files available depend on the system's rotation history and configuration.
-
-#### Inspecting rotated logs
-
-Used:
+#### 1. Inspecting Rotated Logs and Searching Compressed Archives
 
 ```bash
 ls -lh /var/log/auth.log*
-```
-
-Observed:
-
-```text
--rw-r----- 1 syslog adm 7.0K Nov 23 15:20 auth.log
--rw-r----- 1 syslog adm  41K Nov 22 22:26 auth.log.1
-```
-
-This confirmed that the system had a current authentication log and a previous generation.
-
-A search of `auth.log.1` returned no matching authentication failure patterns.
-
-#### Searching compressed logs
-
-Introduced `zgrep`, which searches compressed files without manually extracting them.
-
-Example:
-
-```bash
 sudo zgrep -iE "failed|failure|invalid" /var/log/auth.log.2.gz
+
 ```
 
-The command returned:
+* `ls -lh /var/log/auth.log*` showed active `auth.log` and rotated `auth.log.1`.
+* `zgrep` searches compressed files directly without manual extraction. Running `zgrep` against `/var/log/auth.log.2.gz` returned `gzip: /var/log/auth.log.2.gz: No such file or directory` because that compressed archive did not exist on the system, reinforcing the need to verify available rotated files before querying specific archives.
 
-```text
-gzip: /var/log/auth.log.2.gz: No such file or directory
-```
+#### 2. Inspecting `/etc/logrotate.d/` and `/etc/logrotate.d/rsyslog`
 
-The subsequent listing confirmed that `auth.log.2.gz` did not exist.
-
-**Lesson:** Never assume that every system has the same rotated files. Check which archives actually exist before searching them.
-
-### Investigating Log Rotation Configuration
-
-Inspected the log rotation configuration directory:
-
-```bash
-ls -lah /etc/logrotate.d/
-```
-
-Observed configuration files including:
-
-- `alternatives`
-- `apport`
-- `apt`
-- `btmp`
-- `chrony`
-- `dpkg`
-- `rsyslog`
-- `ubuntu-pro-client`
-- `unattended-upgrades`
-- `wtmp`
-
-Inspected the rsyslog configuration:
-
-```bash
-cat /etc/logrotate.d/rsyslog
-```
-
-Observed:
-
-```conf
-/var/log/syslog
-/var/log/mail.log
-/var/log/kern.log
-/var/log/auth.log
-/var/log/user.log
-/var/log/cron.log
-{
-        rotate 4
-        weekly
-        missingok
-        notifempty
-        compress
-        delaycompress
-        sharedscripts
-        postrotate
-                /usr/lib/rsyslog/rsyslog-rotate
-        endscript
-}
-```
-
-### Understanding the Logrotate Directives
+Listing `/etc/logrotate.d/` showed service rules such as `alternatives`, `apport`, `apt`, `btmp`, `chrony`, `dpkg`, `rsyslog`, `ubuntu-pro-client`, `unattended-upgrades`, and `wtmp`. Inspecting `/etc/logrotate.d/rsyslog` showed rules for `/var/log/syslog`, `/var/log/mail.log`, `/var/log/kern.log`, `/var/log/auth.log`, `/var/log/user.log`, and `/var/log/cron.log`:
 
 | Directive | Meaning |
-|---|---|
-| `rotate 4` | Retain four rotated log generations. |
-| `weekly` | Rotate logs weekly. |
-| `missingok` | Do not report an error if a log file is missing. |
+| --- | --- |
+| `rotate 4` | Retain up to four rotated generations (separate from the active log). |
+| `weekly` | Schedule rotation weekly. |
+| `missingok` | Do not report an error when a specified log file is missing. |
 | `notifempty` | Do not rotate an empty log file. |
-| `compress` | Compress older rotated logs. |
-| `delaycompress` | Delay compression of the most recently rotated log until a subsequent rotation cycle. |
-| `sharedscripts` | Run the post-rotation script once for the group of logs. |
-| `postrotate` | Defines commands to execute after rotation. |
-| `endscript` | Marks the end of the post-rotation script. |
+| `compress` | Compress rotated logs. |
+| `delaycompress` | Delay compression of the most recently rotated log until a subsequent rotation cycle (for example, keeping `.1` uncompressed while older generations become `.2.gz`, `.3.gz`). |
+| `sharedscripts` | Run the post-rotation script once for the group of logs rather than once per file. |
+| `postrotate` / `endscript` | Wrap commands executed after rotation, such as `/usr/lib/rsyslog/rsyslog-rotate` so `rsyslog` reopens file descriptors cleanly instead of writing to a rotated file descriptor. |
 
-The post-rotation script runs:
+### 3.10 Observations, DevOps Relevance, and Completion Status
 
-```bash
-/usr/lib/rsyslog/rsyslog-rotate
-```
+* **Key takeaways:** Practised absolute vs. relative paths, `cd ..` / `cd ../..` / `cd -` / `cd /` / `cd ~`, `pwd`, `mkdir -p`, `ls` / `ls -la` / `ls -lah` / `ls -ld`, `tree`, `find`, symbolic links, `/etc` vs. `/var` and `/tmp`, `tail`, `grep`, `sudo`, `zgrep`, and `logrotate` configuration.
+* **DevOps relevance:** Essential for locating service configurations, navigating application/deployment trees, inspecting application and authentication logs, preventing disk exhaustion from logs, and troubleshooting incidents on Linux servers and cloud instances.
+* **Practice status:** All directory navigation, filesystem hierarchy, log investigation, and logrotate exercises in Section 3 were practised hands-on and are ready for submission.
 
-This helps rsyslog reopen its log files after rotation so that logging continues correctly.
+### 3.11 Evidence
 
-**Understanding `delaycompress`:**
+* **Section Screenshots:**
+* `screenshots/Section-3-Directory-Navigation-and-Filesystem/01-ls-la-project-subdirectories.png` — Hidden files and detailed directory metadata (`ls -la`).
+* `screenshots/Section-3-Directory-Navigation-and-Filesystem/02-tree-project-hierarchy.png` — Hierarchical project layout (`tree`).
+* `screenshots/Section-3-Directory-Navigation-and-Filesystem/03-cd-relative-navigation-and-tree-summary.png` — Relative path navigation (`cd ..`, `cd ~`) and directory summary.
+* `screenshots/Section-3-Directory-Navigation-and-Filesystem/04-filesystem-etc-var-tmp-inspection.png` — Inspection of `/etc`, `/var`, and `/tmp` permissions, ownership, and sticky bit (`ls -ld`).
 
-The most recently rotated log can remain uncompressed as `.1`, while older generations are compressed.
 
-Example:
+* **Supplementary Screenshot:**
+* `screenshots/02-directory-navigation.png` — Earlier directory navigation lab capture.
 
-```text
-auth.log
-auth.log.1
-auth.log.2.gz
-auth.log.3.gz
-```
 
-This does not mean compression waits until a file reaches a particular size. It delays compression by one rotation cycle.
-
-**Understanding retention:**
-
-`rotate 4` specifies four rotated generations, separate from the current active log. The actual number of files present depends on rotation history and whether logs are empty or missing.
-
-### Directory Navigation Observations and Lessons
-
-- Absolute paths start at `/`.
-- Relative paths are resolved from the current working directory.
-- `cd ..` moves to the parent directory.
-- `cd ../..` moves up two directory levels.
-- `cd -` returns to the previous working directory.
-- `/etc` stores system-wide configuration.
-- `/var` stores variable operational data.
-- `/var/log` stores system and application logs.
-- `tail` is useful for inspecting recent log entries.
-- Pipes allow command output to be filtered by other commands.
-- `grep -E` supports multiple search patterns.
-- `sudo` provides elevated privileges for authorised operations.
-- Log rotation prevents logs from growing indefinitely.
-- `zgrep` searches compressed log archives.
-- Logrotate configuration determines rotation frequency, compression and retention.
-- Log ownership and permissions control access to sensitive information.
-
-### DevOps Relevance
-
-Filesystem navigation and log investigation are essential when:
-
-- Accessing application configuration.
-- Inspecting system and application logs.
-- Navigating deployment directories.
-- Managing scripts and configuration files.
-- Troubleshooting Linux servers.
-- Investigating service failures.
-- Identifying authentication and privilege-related events.
-- Managing log retention and storage.
-- Retrieving historical evidence during incident investigations.
-
-### Remaining Directory Navigation Exercises
-
-- [ ] Explore `/tmp` and understand its permissions.
-- [ ] Create and remove temporary files safely.
-- [ ] Inspect the sticky bit on `/tmp`.
-- [ ] Practise locating files from different starting directories.
-- [ ] Explore symbolic links in more detail.
-- [ ] Capture screenshots showing navigation and filesystem investigations.
-
----
+* **Repository Artifacts:**
+* `artifacts/navigation/projects/webapp/logs/`
 
 ## 4. System Monitoring and Administration
 
-### Project Requirements
+### 4.1 Objective
 
-Inspect system health, monitor processes and resources, manage users and groups, and understand file permissions and ownership.
+Develop practical skills for monitoring system resources and processes, managing `systemd` services, inspecting system logs, and querying installed packages on Ubuntu.
 
-### Commands to Practise
+### 4.2 Commands Practised
 
-- `uptime`: Display system uptime and load averages.
-- `free -m`: Display memory usage in megabytes.
-- `df -h`: Display filesystem disk usage.
-- `ps aux`: Display running processes.
-- `top`: Monitor processes and resource usage interactively.
-- `id`: Display user and group identity information.
-- `chmod`: Modify file permissions.
-- `chown`: Change file ownership.
-- `sudo`: Execute commands with elevated privileges.
-- `useradd`: Create user accounts.
-- `groupadd`: Create groups.
-- `usermod`: Modify user account properties.
+| **Command** | **Purpose** |
+| --- | --- |
+| `ps aux` | Snapshot running processes across users, including CPU/memory usage and full commands. |
+| `top` | Monitor live processes and system resource consumption interactively. |
+| `free -m` | Display physical memory (RAM) and swap usage in megabytes. |
+| `df -h` | Report filesystem disk space usage and free capacity in human-readable units. |
+| `uptime` | Show how long the system has been running and 1-, 5-, and 15-minute load averages. |
+| `systemctl` | Inspect and control `systemd` units and services. |
+| `journalctl` | Query and filter logs recorded by `systemd-journald`. |
+| `du -sh` | Calculate summarised disk usage (`-s`) in human-readable format (`-h`) for a directory or path. |
+| `apt list --installed` | List packages installed through APT on the system. |
+| `dpkg -l` | Display package status and details from the local `dpkg` database. |
 
-### System Metrics
+### 4.3 Process and Resource Monitoring
 
-Actual outputs will be recorded after running the commands on the Ubuntu environment.
+Resource inspection exercises focused on distinguishing short-term spikes from sustained bottlenecks:
 
-### Permissions and Ownership
+- **Processes:** Using `ps aux` for a point-in-time process list and `top` for interactive observation of active tasks and resource consumers.
 
-Practical exercises will cover:
+- **Memory and swap:** Checking RAM allocation, buffers/cache, and swap utilisation with `free -m` to spot memory pressure.
 
-- Linux users and groups.
-- File ownership.
-- Read, write and execute permissions.
-- Symbolic and numeric permission notation.
-- Modifying permissions with `chmod`.
-- Changing ownership with `chown`.
-- Understanding administrative privileges with `sudo`.
+- **Storage capacity:** Checking mounted filesystem capacity with `df -h` and pinpointing heavy directories with `du -sh` (useful before services fail due to full disks or runaway logs).
 
-### Package Management
+- **Uptime and load average:** Reading `uptime` load averages alongside CPU core count and I/O/wait activity to judge whether load reflects compute saturation or processes waiting on I/O.
 
-Additional assessment requirement.
+### 4.4 Service Management and System Logs
 
-Commands to practise:
+Exercises covered how `systemd` manages background services and integrates with logging:
 
-- `apt update`: Refresh package indexes.
-- `apt upgrade`: Upgrade installed packages.
-- `apt install`: Install packages.
-- `apt remove`: Remove installed packages.
-- `apt list --installed`: Inspect installed packages.
+- Inspecting service states and unit definitions using `systemctl`, including checking the `cron` service.
 
-Package installation, version checks and terminal evidence will be documented after execution.
+- Creating and managing a custom `linux-lab.service` unit, practising lifecycle operations (starting, stopping, and restarting) and observing how unit behaviour is reflected in logs.
 
----
+- Querying service and system events with `journalctl` and reviewing journal maintenance/restart/cleanup behaviour.
+
+### 4.5 Package Management
+
+#### APT vs. DPKG
+
+On Debian and Ubuntu systems, **APT** (`apt`, `apt-cache`, `apt-get`) and **DPKG** (`dpkg`) operate at different layers of package management:
+
+- **APT (high-level package manager):** Resolves dependency trees across configured software repositories, downloads packages, coordinates upgrades/removals across interdependent packages, and maintains repository metadata.
+
+- **DPKG (low-level package manager):** Installs, configures, queries, or removes individual `.deb` package archives directly on the local system and tracks installed package states in the local `dpkg` database without automatically resolving remote repository dependencies.
+
+#### Package Operations and Inventory
+
+- **Package inventory and status inspection:** Used `apt list --installed` to list installed packages and `dpkg -l` to inspect package states. The `ii` status indicates that a package is selected for installation and is currently installed.
+
+- **Package metadata inspection:** Used `apt show <package>` and `dpkg -s <package>` to inspect package descriptions, versions, dependencies, and installation status. APT provides repository-level package information, while DPKG reports the local package database state.
+
+- **Package installation:** Practised installing packages through APT using `sudo apt install <package>` and installing local Debian package archives using `sudo dpkg -i <file.deb>`. APT resolves repository dependencies, whereas DPKG installs the specified local archive and may require dependency correction if packages are missing.
+
+- **Package removal:** Practised `sudo apt remove <package>` to remove installed package software while generally retaining system-wide configuration files, and `sudo apt purge <package>` to remove package configuration files as well.
+
+- **Package verification:** Used package queries to check installation state after package operations. The `tree` package was also inspected in the installed-package inventory.
+
+These exercises demonstrated the distinction between repository-based package management with APT and direct package operations through DPKG.
+
+### 4.6 Evidence
+
+- Repository reference: `artifacts/permissions-lab/cowsay_3.03+dfsg2-8build1_all.deb`.
+
+- Screenshot references: `screenshots/Section-4-System-Monitoring-and-Administration/01-journalctl-rsyslog-and-disk-usage.png`, `screenshots/Section-4-System-Monitoring-and-Administration/02-systemctl-cron-status-and-unit.png`, `screenshots/Section-4-System-Monitoring-and-Administration/03-systemd-custom-service-lifecycle.png`, `screenshots/Section-4-System-Monitoring-and-Administration/04-systemd-journal-restart-and-cleanup.png`, `screenshots/Section-4-System-Monitoring-and-Administration/05-ps-df-free-uptime-monitoring.png`, `screenshots/Section-4-System-Monitoring-and-Administration/06-uptime-load-average.png`, `screenshots/Section-4-System-Monitoring-and-Administration/07-apt-list-installed.png`, `screenshots/03a-system-monitoring.png`, and `screenshots/03b-permissions-admin.png`.
 
 ## 5. Networking Basics
 
-### Project Requirements
+### 5.1 Objective
 
-Verify network connectivity and inspect network configuration.
+Build foundational Linux networking skills for testing reachability, tracing name resolution, inspecting network interfaces and IP addresses, and checking listening sockets.
 
-### Commands to Practise
+### 5.2 Commands Practised
 
-- `ip addr`: Display network interfaces and IP addresses.
-- `ip -br addr`: Display network interfaces in brief format.
-- `ping`: Test network connectivity.
-- `ss -tulnp`: Inspect listening sockets and associated processes.
-- `netstat`: Alternative network inspection utility where installed.
+| **Command** | **Purpose** |
+| --- | --- |
+| `ping` | Test reachability and round-trip latency using ICMP echo requests. |
+| `ip addr` | Display network interfaces, link states, and assigned IPv4/IPv6 addresses. |
+| `ss -tulnp` | List TCP (`-t`) and UDP (`-u`) listening (`-l`) sockets with numeric ports (`-n`) and process info (`-p`) where available. |
+| `dig` | Query DNS servers directly for record types such as `A`, `AAAA`, and `MX`. |
+| `cat` | Inspect host, resolver, and name-service configuration files. |
+| `hostname` | Display or inspect the system hostname. |
 
-### Observations
+### 5.3 Connectivity Testing
 
-Actual network interfaces, connectivity results and listening sockets will be recorded from the system.
+Exercises used `ping` to verify reachability, examine ICMP echo request/reply behaviour, and check command exit statuses to distinguish reachable hosts from unreachable targets or blocked ICMP traffic.
 
-### DevOps Relevance
+### 5.4 DNS and Name Resolution
 
-Networking knowledge helps with:
+Name resolution exercises examined both local overrides and DNS queries:
 
-- Troubleshooting server connectivity.
-- Inspecting IP addresses and interfaces.
-- Understanding listening services.
-- Diagnosing application connectivity problems.
-- Investigating communication between services.
-- Understanding network dependencies in deployments.
+- Inspecting `/etc/resolv.conf` (name servers/search domains), `/etc/hosts` (static local hostname mappings), `/etc/nsswitch.conf` (lookup ordering across sources such as `files` and `dns`), and system `hostname`.
 
----
+- Using `dig` to inspect `A` (IPv4), `AAAA` (IPv6), and `MX` (mail exchange) records.
 
-## 6. Pipes and Redirection
+- Distinguishing local hostname/hosts-file resolution from external DNS lookups, which helps diagnose environments where a service resolves locally but fails to query upstream DNS (or vice versa).
 
-### Project Requirements
+### 5.5 Network Interfaces and Sockets
 
-Redirect command output and errors, and combine commands using pipelines to filter and process information.
+Exercises inspected interfaces and open sockets:
 
-### Operators and Commands
+- Using `ip addr` to identify loopback (`lo`) and Ethernet/virtual interfaces along with assigned addresses.
 
-- `>`: Redirect standard output and overwrite a file.
-- `>>`: Append standard output to an existing file.
-- `2>`: Redirect standard error.
-- `|`: Pass the output of one command into another.
-- `grep`: Filter matching text.
-- `awk`: Extract and process fields.
-- `sort`: Sort output.
-- `uniq`: Identify adjacent duplicate lines.
-- `cat`: Display or combine file contents.
+- Using `ss -tulnp` to inspect listening TCP/UDP ports and identify bound services—a core step when verifying whether a daemon is listening or troubleshooting port conflicts and firewall/reachability issues.
 
-### Observations
+### 5.6 Evidence
 
-- `>` replaces existing file contents.
-- `>>` preserves existing content and appends new output.
-- `2>` redirects error output rather than standard output.
-- A here-document (`<<`) supplies multiple lines of input to a command.
-- Using `>` with a here-document writes the supplied output to a file, replacing its previous contents.
-- Pipes allow commands to work together without manually saving intermediate output.
-- Commands can be chained to filter, transform and inspect information.
+- Screenshot references: `screenshots/Section-5-Networking-Basics/01-ping-icmp-and-exit-status.png`, `screenshots/Section-5-Networking-Basics/02-dns-resolv-hosts-nsswitch-and-hostname.png`, `screenshots/Section-5-Networking-Basics/03-dig-dns-records-a-aaaa-mx.png`, `screenshots/Section-5-Networking-Basics/05-ping-and-resolver-diagnostics.png`, `screenshots/Section-5-Networking-Basics/07-ip-addr-and-ss-listening-sockets.png`, and `screenshots/04-networking-basics.png`.
 
-Practical exercises, terminal outputs and troubleshooting observations will be documented after execution.
+## 6. Pipes, Redirection and Text Processing
 
----
+### 6.1 Objective
+
+Develop practical skills in connecting commands with pipes, controlling standard I/O streams via redirection, separating error output, and filtering or transforming text for log analysis and automation.
+
+### 6.2 Commands Practised
+
+| **Command / Operator** | **Purpose** |
+| --- | --- |
+| `\|` | Pipe standard output of one command into the standard input of the next. |
+| `>` | Redirect standard output to a file, overwriting existing content. |
+| `>>` | Append standard output to the end of a file. |
+| `2>` | Redirect standard error (fd 2) to a file, overwriting existing content. |
+| `2>>` | Append standard error (fd 2) to a file. |
+| `&>` | Redirect both standard output and standard error together (Bash). |
+| `/dev/null` | Null device that discards written output and returns EOF on read. |
+| `wc` | Count lines (`-l`), words (`-w`), and bytes/characters (`-c`/`-m`). |
+| `grep` | Filter lines matching regular expressions or text patterns. |
+| `awk` | Scan and process structured text lines and fields. |
+| `tr` | Translate, squeeze, or delete characters from standard input. |
+| `sort` | Sort lines of text. |
+| `uniq` | Filter or count adjacent matching lines (typically paired with `sort`). |
+| `tee` | Write input to one or more files while simultaneously passing it to stdout. |
+| `sed` | Perform stream-based text substitutions and edits. |
+
+### 6.3 Standard Streams and Redirection
+
+Every Linux process starts with three standard file descriptors: **stdin** (fd `0`), **stdout** (fd `1`), and **stderr** (fd `2`). Separating `stdout` from `stderr` prevents diagnostic messages from polluting data files or downstream pipeline inputs.
+
+In a practical experiment, the following command redirected normal output and error output into separate files:
+
+```bash
+ls /etc /directory_that_does_not_exist > output.log 2> errors.log
+```
+
+This demonstrates how standard output and standard error can be captured independently.
+
+To capture both streams in one file, the following command was also practised:
+
+```bash
+ls /etc /directory_that_does_not_exist > combined.log 2>&1
+```
+
+The order matters: `> combined.log` redirects standard output first, and `2>&1` then redirects standard error to the same destination as standard output.
+
+**Observed behaviour:**
+
+- Valid listing output for `/etc` was written to `output.log` (`stdout`).
+- The error message for `/directory_that_does_not_exist` was written separately to `errors.log` (`stderr`).
+- Additional exercises practised appending (`>>`, `2>>`), combined redirection (`&>`), discarding noise via `/dev/null`, and checking exit statuses. Log artifacts such as `artifacts/pipes-redirection-lab/app.log`, `combined.log`, `combined-short.log`, `errors-only.log`, `errors.log`, `output.txt`, `topics.txt`, `artifacts/server_events.log`, `artifacts/stderr_capture.log`, `artifacts/error_summary.txt`, `docs/output.log`, and `docs/errors.log` reflect redirection and text-processing work in the repository.
+
+### 6.4 Pipes and Text Processing
+
+Exercises chained commands with `|` to filter, count, reshape, and summarise text:
+
+- Counting and pattern filtering with `wc` and `grep`.
+
+- Field extraction and formatting with `awk`, character translation with `tr`, ordering with `sort`, deduplicating adjacent lines with `uniq`, branching streams with `tee`, and pattern replacement with `sed`.
+
+`uniq` only detects adjacent repeated lines. To count duplicates across an entire unsorted input, use:
+
+```bash
+sort file.txt | uniq -c
+```
+
+#### Evidence Note on `topics.txt` Match Count
+
+A discrepancy exists between the historical run recorded in `screenshots/Section-6-Pipes-Redirection-and-Text-Processing/01-redirection-stdout-stderr-devnull-and-wc-grep.png`—where `grep "DevOps" topics.txt | wc -l` yielded `5`—and the preserved `artifacts/pipes-redirection-lab/topics.txt` file, which contains only one matching entry. Because `topics.txt` was likely edited or overwritten across later lab iterations or file updates, the earlier multi-line contents at the time of that run are no longer preserved in the artifact, so the limitation is noted directly rather than guessed.
+
+### 6.5 Evidence
+
+- Repository artifacts in `artifacts/pipes-redirection-lab/` and log files under `artifacts/` and `docs/`.
+
+- Screenshot references: `screenshots/Section-6-Pipes-Redirection-and-Text-Processing/01-redirection-stdout-stderr-devnull-and-wc-grep.png`, `screenshots/Section-6-Pipes-Redirection-and-Text-Processing/02-awk-tr-sort-uniq-tee-and-sed.png`, and `screenshots/05-pipes-and-redirection.png`.
 
 ## 7. Shell Scripting
 
-### Script
+### 7.1 Objective
 
-`scripts/setup_workspace.sh`
+Apply Linux CLI fundamentals to write maintainable Bash scripts using variables, arguments, conditionals, loops, functions, error handling, and explicit exit codes.
 
-### Project Requirements
+### 7.2 Concepts and Commands Practised
 
-Write a reusable Bash script incorporating variables, conditionals and loops to automate directory creation and logging.
+| **Concept / Command** | **Purpose** |
+| --- | --- |
+| Variables | Store reusable configuration values, paths, and state inside a script. |
+| Positional parameters | Access command-line arguments passed to a script (`$1`, `$2`, `$#`, `$@`). |
+| Functions | Group reusable logic into modular, readable blocks. |
+| Conditionals | Branch execution based on test expressions and exit statuses (`if`/`elif`/`else`, `case`). |
+| Loops | Repeat tasks across lists, ranges, or files (`for`, `while`). |
+| `echo` | Print text and expanded variables to standard output. |
+| `read` | Read interactive user input from standard input. |
+| `exit` | Exit the script with a specific numeric status code (`0` for success, non-zero for failure/usage errors). |
+| `$?` | Inspect the exit status of the most recently executed command. |
+| `date` | Format timestamps for logs and reports. |
+| `command -v` | Check whether an executable or command is available in `PATH`. |
+| `bash -n` | Check script syntax without executing commands. |
+| `set -euo pipefail` | Enables commonly used Bash strict-mode settings: `-u` treats unset variables as errors, `-e` exits on many unhandled command failures (subject to Bash's conditional and command-list exceptions), and `-o pipefail` makes a pipeline return a failure status when a command within it fails. |
 
-### Concepts
+### 7.3 Workspace Automation
 
-- Bash shebang: `#!/usr/bin/env bash`
-- Strict error handling: `set -euo pipefail`
-- Variables.
-- Directory creation.
-- Conditional statements.
-- Loops.
-- Directory existence checks.
-- Executable permissions using `chmod +x`.
-- Logging and timestamps.
+A workspace setup script (`scripts/setup_workspace.sh`) was built to automate directory and file creation using variables, functions, and loops so workspace setup is repeatable rather than manual, alongside sample workspace artifacts such as `artifacts/workspace_demo/`, `artifacts/workspace test/`, and `artifacts/section7_test/`.
 
-### Practical Objective
+### 7.4 Service Checker Script
 
-Build a reusable workspace initialization script that checks for existing directories, creates missing directories and records execution timestamps.
+A service-checking script (`artifacts/shell-scripting-lab/service_checker.sh`, with accompanying `artifacts/shell-scripting-lab/service_checker.log` and `docs/service_checker.log`) was created to inspect requested system services and log results:
 
-Execution results and script behaviour will be verified and documented.
+- Accepts service names via command-line arguments and checks service status using system service commands.
 
----
+- Evaluates service states with conditional logic and writes timestamped log messages.
 
-## 8. Troubleshooting Log
+- Uses strict Bash settings, syntax checking via `bash -n`, explicit exit statuses, and a check for Docker CLI availability (`command -v`).
 
-Record actual errors encountered, their causes and the commands used to resolve them.
+#### Historical vs. Current Service State Reporting
 
-### Git Push Rejected
+There is a clear distinction between an **inactive/stopped service** and a **missing service unit** in `systemd`:
 
-**Error:** Git push rejected with fetch first / non-fast-forward.
+- **Inactive / stopped service:** The unit file exists in `systemd` (so `systemd` recognises the unit), but the service process is currently stopped (`inactive`/`dead`), which an earlier script version/run reported as `Not running` (as seen in `screenshots/Section-7-Shell-Scripting/03-service-checker-exit-codes-syntax-and-logging.png`).
 
-**Cause:** The remote repository already contained an initial commit that was not present locally.
+- **Service unit not found:** No matching `systemd` unit exists for the requested service name, which the current `artifacts/shell-scripting-lab/service_checker.sh` reports as `Service unit not found`.
 
-**Resolution:**
+Because `service_checker.sh` evolved during development, historical output messages (`Not running`) reflect earlier script behaviour, whereas `Service unit not found` reflects the current script's handling of unknown or non-existent units.
 
-```bash
-git pull --rebase origin main
-git checkout --theirs README.md
-git add README.md
-git rebase --continue
-git push -u origin main
-```
+### 7.5 Exit Status Verification
 
-The rebase was completed and the changes were pushed.
+Testing `service_checker.sh` across scenarios confirmed clear status reporting:
 
-### Incorrect File Paths
+| **Test Case** | **Observed Result** |
+| --- | --- |
+| Check `cron` while running | Exit status `0` |
+| Supply an invalid / non-existent service | Exit status `1` |
+| Run without required arguments | Exit status `2` |
+| Execute an incorrect script path | Shell-generated exit status `127` (command not found) |
 
-**Error:**
+### 7.6 Evidence
 
-```text
-cp: cannot stat 'application.log': No such file or directory
-```
+- Repository scripts and artifacts: `scripts/setup_workspace.sh`, `artifacts/shell-scripting-lab/service_checker.sh`, `artifacts/shell-scripting-lab/service_checker.log`, `docs/service_checker.log`, `artifacts/workspace_demo/`, `artifacts/workspace test/`, and `artifacts/section7_test/`.
 
-**Cause:** The command used a relative path that did not match the file's actual location.
+- Screenshot references: `screenshots/Section-7-Shell-Scripting/01-setup-workspace-functions-and-loops.png`, `screenshots/Section-7-Shell-Scripting/02-workspace-logs-strict-mode-and-git-status.png`, `screenshots/Section-7-Shell-Scripting/03-service-checker-exit-codes-syntax-and-logging.png`, `screenshots/Section-7-Shell-Scripting/04-service-checker-and-docker-cli-checks.png`, and `screenshots/06-shell-scripting.png`.
 
-**Resolution:** Used the correct path from the project root:
+## 8. Troubleshooting and Problem Solving
 
-```text
-artifacts/file-management/source/application.log
-```
+### 8.1 Objective
 
-### Incorrect Copy Arguments
+Build a disciplined troubleshooting workflow for diagnosing and fixing command, path, argument, scripting, environment, and Git issues using actual outputs and exit codes.
 
-**Error:**
+### 8.2 Troubleshooting Areas
 
-```text
-cp: target '...' is not a directory
-```
+- **File and directory paths:** Diagnosing wrong paths, missing files/directories, and non-directory path errors (for example, `artifacts/not_a_directory`).
 
-**Cause:** Incorrect source and destination arguments.
+- **Command arguments:** Catching missing or invalid flags/arguments and checking expected usage.
 
-**Lesson:** Understand the `SOURCE DESTINATION` structure of `cp`.
+- **Command execution:** Reading error messages carefully and distinguishing full failure from partial completion.
 
-### Partial Command Success
+- **Exit statuses:** Using `$?` and script return codes to confirm whether commands or pipeline steps succeeded or failed.
 
-**Observation:** A copy command reported an error for an invalid source but successfully copied another valid source.
+- **Shell scripting:** Resolving syntax errors, bad inputs, execution issues, and unexpected exit codes.
 
-**Lesson:** A command can partially succeed. Always inspect its output and verify the resulting files.
+- **Git operations:** Handling non-fast-forward push rejections when remote branches have commits not yet local, and resolving sync cleanly (such as pulling/rebasing before pushing).
 
-### Attempting to Execute a Text File
+- **WSL environment:** Investigating WSL2/Ubuntu messages and environment quirks during hands-on work.
 
-**Error:** `command not found` or `Permission denied`.
+### 8.3 Troubleshooting Approach
 
-**Cause:** Attempted to execute a log file as though it were a program.
+1. Identify the exact command or script step that produced unexpected behaviour.
 
-**Resolution:** Use `cat` or another file-inspection command to read text files.
+2. Read the full error message and note which stream (`stdout`/`stderr`) carried it.
 
-### WSL Ubuntu Pro Service Warning
+3. Verify command syntax, arguments, and target file/directory paths.
 
-**Observed in:** `/var/log/syslog`
+4. Inspect relevant files, permissions, service states, or environment settings.
 
-The WSL Pro service repeatedly reported that it could not connect to the Windows agent because it could not find:
+5. Check `$?` and output details to narrow down the root cause.
 
-```text
-/mnt/c/Users/victo/.ubuntupro/.address
-```
+6. Apply a targeted fix and re-run the command.
 
-The service exited and systemd scheduled subsequent restart attempts.
+7. Confirm the expected result and clean state.
 
-**Lesson:** Log warnings should be investigated in context. A warning does not automatically indicate a critical system failure. The relevance of the Ubuntu Pro integration to the WSL environment should be assessed before attempting to resolve it.
+### 8.4 Lessons Learned
 
----
+- An error message does not always mean an entire command failed; multi-target commands can succeed on valid items while failing on invalid ones.
 
-## 9. Learning Summary
+- Exit statuses provide reliable signals for automation and verification beyond visual inspection alone.
 
-This project develops practical Linux command-line proficiency through repeated exercises in:
+- Valid commands still fail when given bad paths, missing arguments, or insufficient permissions.
 
-- File and directory management.
-- Filesystem navigation.
-- System monitoring and administration.
-- Package management.
-- Permissions and ownership.
-- Networking.
-- Pipes and redirection.
-- Bash scripting and automation.
-- Log investigation and rotation.
-- Documentation and version control.
+- Non-fast-forward Git push rejections happen when the remote history is ahead of local history; syncing local changes with remote commits before pushing avoids clobbering work.
 
-The objective is to understand not only how commands work individually, but also how they can be combined to perform common DevOps administration tasks.
+- Diagnosing from observed output prevents guesswork, and re-running commands blindly without understanding the cause can compound problems.
 
-The project prioritises practical execution, understanding command behaviour, troubleshooting errors and documenting verified results.
+### 8.5 Evidence
 
-### Repository Structure
+Troubleshooting is reflected across the terminal exercises, scripts (`scripts/setup_workspace.sh`, `artifacts/shell-scripting-lab/service_checker.sh`), log and lab artifacts (`artifacts/not_a_directory`, `artifacts/stderr_capture.log`, `artifacts/error_summary.txt`, `docs/errors.log`, `docs/output.log`), and session records throughout the project; there is no standalone screenshot directory for Section 8.
 
-The repository should contain:
+## 9. Project Summary
 
-- `README.md`: Project overview, goals, command list, completion checklist and learning summary.
-- `docs/notes.md`: Detailed documentation, observations, command outputs and troubleshooting.
-- `scripts/`: Reusable shell scripts with internal comments.
-- `screenshots/`: Visual evidence of completed exercises.
-- `artifacts/`: Sample files, logs and configuration extracts generated during exercises.
+### 9.1 Project Overview
 
-### Current Learning Progress
+The **Linux and Command Line Mastery** project builds practical command-line proficiency in Ubuntu on WSL2 across fundamentals, file and permission management, system monitoring and services, networking, streams and text processing, Bash scripting, and troubleshooting.
 
-**Completed practical areas:**
-- File creation and directory creation.
-- File inspection.
-- Copying, moving and renaming.
-- Searching with `find` and `grep`.
-- Safe and recursive deletion.
-- Interactive file inspection with `less`.
-- Absolute and relative path navigation.
-- Parent-directory and previous-directory navigation.
-- Exploring `/`, `/etc`, `/var` and `/var/log`.
-- Inspecting system and authentication logs.
-- Filtering log entries using `grep`.
-- Understanding log rotation and inspecting logrotate configuration.
+### 9.2 Skills Developed
 
-**Next practical focus:**
-- Explore `/tmp`.
-- Understand temporary-file permissions and the sticky bit.
-- Continue filesystem navigation and investigation.
-- Progress into system monitoring and administration.
+- **Linux Fundamentals:** Filesystem navigation, file/directory operations, permissions, ownership, user/group management, and privileged commands.
 
-The project should continue to document actual terminal evidence as each practical exercise is completed.
+- **System Administration:** Process and resource monitoring (`ps`, `top`, `free`, `df`, `du`, `uptime`), `systemd` service management, `journalctl` log inspection, and APT/DPKG package checks.
+
+- **Networking:** Connectivity testing (`ping`), DNS and local resolver inspection (`dig`, `/etc/hosts`, `/etc/resolv.conf`, `/etc/nsswitch.conf`, `hostname`), and interface/socket inspection (`ip addr`, `ss`).
+
+- **Command-Line Data Processing:** Stream redirection (`>`, `>>`, `2>`, `2>>`, `&>`, `/dev/null`), pipelines (`|`), and text utilities (`grep`, `wc`, `awk`, `tr`, `sort`, `uniq`, `tee`, `sed`).
+
+- **Bash Scripting and Automation:** Variables, positional parameters, functions, conditionals, loops, exit codes, `command -v`, `bash -n`, `set -euo pipefail`, workspace setup automation, and service checking.
+
+- **Troubleshooting:** Systematic diagnosis using error messages, exit statuses, path/permission checks, and Git synchronisation workflows.
+
+### 9.3 Practical Project Evidence
+
+The repository collection contains:
+
+- Documentation (`README.md` and `docs/notes.md`).
+
+- Scripts (`scripts/setup_workspace.sh` and `artifacts/shell-scripting-lab/service_checker.sh`).
+
+- Exercise artifacts and logs under `artifacts/` and `docs/`.
+
+- 27 section-organised screenshots across `screenshots/Section-1-Learning-Environment` through `screenshots/Section-7-Shell-Scripting`, plus 7 earlier supplementary screenshots in `screenshots/`.

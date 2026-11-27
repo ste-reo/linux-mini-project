@@ -1,0 +1,7 @@
+INFO User logged in
+ERROR Database connection failed
+INFO Request processed
+WARNING High memory usage
+ERROR Payment service unavailable
+INFO User logged out
+ERROR Database connection failed

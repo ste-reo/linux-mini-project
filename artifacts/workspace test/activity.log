@@ -1,0 +1,5 @@
+[2026-11-25 11:45:35] [INFO] Initializing workspace at './artifacts/workspace test'
+[2026-11-25 11:45:35] [INFO] Created directory: ./artifacts/workspace test/raw
+[2026-11-25 11:45:35] [INFO] Created directory: ./artifacts/workspace test/processed
+[2026-11-25 11:45:35] [INFO] Created directory: ./artifacts/workspace test/reports
+[2026-11-25 11:45:35] [INFO] Workspace setup complete.
